@@ -1,27 +1,28 @@
-/* global L, console, foursq_client_id, foursq_client_secret, untappd_client_id, untappd_client_secret */
+/* global L, console, foursq_client_id, foursq_client_secret */
 (function(){
 var map = L.map('map');
 var pubs = [];
 
+function hide_show_markers() {
+    console.log("showing_markers");
+    console.log(pubs);
+    $.each(pubs, function(i, pub){
+        console.log(pub);
+        if(map.getBounds().contains(pub.getLatLng())) {
+            map.addLayer(pub);
+        }
+        else {
+            map.removeLayer(pub);
+        }
+    });
+}
+
+
 function add_pub(venue_data) {
     var marker = new L.marker([venue_data.location.lat, venue_data.location.lng], {
         title: venue_data.name
-    }).addTo(map);
-    pubs.append(marker);
-    console.log(venue_data);
-
-    /* Untappd stupid API limit
-    var fsq_id = venue_data.id;
-    $.getJSON("http://api.untappd.com/v4/venue/foursquare_lookup/" + fsq_id, {
-        client_id: untappd_client_id,
-        client_secret: untappd_client_secret
-    }).done(function(data){
-        console.log(data);
-        console.log(data.response.venue.items[0].venue_id);
-    }).fail(function(data) {
-        console.log('oh no');
     });
-    */
+    pubs.push(marker);
 }
 
 
@@ -37,10 +38,34 @@ function onLocationFound() {
     console.log('not implemented yet! - onLocationFound');
 }
 
+function radians(degrees) {
+    return degrees * (Math.PI/180);
+}
+
+function getMapWidthInMetres() {
+    var center = map.getCenter();
+    var bounds = map.getBounds();
+
+    console.log(center);
+    console.log(bounds);
+
+    //haversine formula
+    var R = 6371; // km
+    var dLat = radians(center.lat - bounds.getNorthEast.lat);
+    var dLon = radians(center.lng - bounds.getNorthEast.lng);
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(radians(center.lat)) * Math.cos(radians(bounds.getNorthEast.lat)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return d;
+}
+
 function onMoveEnd() {
     var center = map.getCenter();
     console.log(center);
     var ll = center.lat + "," + center.lng;
+    console.log(getMapWidthInMetres());
     $.getJSON("https://api.foursquare.com/v2/venues/search", {
         ll: ll,
         radius: 500,
@@ -55,7 +80,9 @@ function onMoveEnd() {
         $.each(data.response.venues, function(i, item) {
             add_pub(item);
         });
+        hide_show_markers();
     });
+    hide_show_markers();
 }
 
 
