@@ -1,6 +1,7 @@
-/* global L, console, foursq_client_id, foursq_client_secret */
+/* global L, console, foursq_client_id, foursq_client_secret, zooms*/
 (function(){
 var map = L.map('map');
+var pub_ids = [];
 var pubs = [];
 
 function hide_show_markers() {
@@ -22,7 +23,10 @@ function add_pub(venue_data) {
     var marker = new L.marker([venue_data.location.lat, venue_data.location.lng], {
         title: venue_data.name
     });
-    pubs.push(marker);
+    if(pub_ids.indexOf(venue_data.id) <= -1) {
+        pub_ids.push(venue_data.id);
+        pubs.push(marker);
+    }
 }
 
 
@@ -38,37 +42,16 @@ function onLocationFound() {
     console.log('not implemented yet! - onLocationFound');
 }
 
-function radians(degrees) {
-    return degrees * (Math.PI/180);
-}
-
-function getMapWidthInMetres() {
-    var center = map.getCenter();
-    var bounds = map.getBounds();
-
-    console.log(center);
-    console.log(bounds);
-
-    //haversine formula
-    var R = 6371; // km
-    var dLat = radians(center.lat - bounds.getNorthEast.lat);
-    var dLon = radians(center.lng - bounds.getNorthEast.lng);
-    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(radians(center.lat)) * Math.cos(radians(bounds.getNorthEast.lat)) *
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    var d = R * c;
-    return d;
-}
-
 function onMoveEnd() {
     var center = map.getCenter();
-    console.log(center);
     var ll = center.lat + "," + center.lng;
-    console.log(getMapWidthInMetres());
+    var map_width = Math.max(map.getSize().x, map.getSize().y);
+    var zoom = map.getZoom();
+    var metres = zooms[zoom] * map_width;
+
     $.getJSON("https://api.foursquare.com/v2/venues/search", {
         ll: ll,
-        radius: 500,
+        radius: metres,
         limit: 50,
         intent: "checkin",
         categoryId: "4bf58dd8d48988d155941735,4bf58dd8d48988d11b941735,4d4b7105d754a06376d81259",
