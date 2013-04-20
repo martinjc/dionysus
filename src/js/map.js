@@ -1,9 +1,10 @@
 /* global L */
-var map = L.map('map')
+var map = L.map('map');
 
-var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-var osmAttrib='Map data © OpenStreetMap contributors';
-var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib});
+var tileUrl='http://{s}.tile.cloudmade.com/364b324514d240c8afdd7ba132fd4841/997/256/{z}/{x}/{y}.png';
+var attrib='Map data © OpenStreetMap contributors';
+var tileLayer = new L.TileLayer(tileUrl, {minZoom: 8, maxZoom: 18, attribution: attrib});
 
-map.setView(new L.LatLng(51.3, 0.7),9);
-map.addLayer(osm);
+map.addLayer(tileLayer);
+
+map.locate({setView: true, maxZoom: 18});
