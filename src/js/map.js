@@ -104,7 +104,10 @@ function add_recommended_pub(venue_data) {
         });
     }
     popupstr += "</ul>";
-    popupstr += "<h4>Liked by:</h4><p>" + venue_data.venue.likes.summary + "</p>";
+    if(venue_data.venue.likes.summary !== 'undefined') {
+        popupstr += "<h4>Liked by:</h4><p>" + venue_data.venue.likes.summary + "</p>";    
+    }
+    
     marker.bindPopup(popupstr);
     if(pub_ids.indexOf(venue_data.venue.id) <= -1) {
         pub_ids.push(venue_data.venue.id);
