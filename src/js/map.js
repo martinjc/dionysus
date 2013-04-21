@@ -14,30 +14,36 @@ var lastfm = new LastFM({
 });
 
 // http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
-function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&|#]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+function getURLParameter(name, location) {
+    return decodeURIComponent((new RegExp('[?|&|#]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location)||[,""])[1].replace(/\+/g, '%20'))||null;
 }
 
 
 function do_auth() {
-    var auth = getURLParameter('auth');
+    var auth = getURLParameter('auth', location.search);
 
     if(localStorage.lastfmauth === undefined) {
         if(auth === 'lastfm') {
-            var token = getURLParameter('token');
-            lastfm.auth.getSession({
-                api_key : lastfm_api_key,
-                token : token
-            }, {success: function(data){
-                localStorage.lastfmauth = JSON.stringify(data.session);
-            }, error: function(code, message){
-                console.log(message);
-            }});
+            var token = getURLParameter('token', location.search);
+            if(token !== null) {
+                lastfm.auth.getSession({
+                    api_key : lastfm_api_key,
+                    token : token
+                }, {success: function(data){
+                    localStorage.lastfmauth = JSON.stringify(data.session);
+                }, error: function(code, message){
+                    console.log(message);
+                }});
+            }
         }
     }
     if (localStorage.foursquareauth === undefined) {
+        var auth = getURLParameter('access_token', window.location.hash);
+        console.log(auth);
         var auth = decodeURIComponent((new RegExp('[?|&|#]' + 'access_token' + '=' + '([^&;]+?)(&|#|;|$)').exec(window.location.hash)||[,""])[1].replace(/\+/g, '%20'))||null;
-        localStorage.foursquareauth = auth;
+        if(auth !== null) {
+            localStorage.foursquareauth = auth;    
+        }
     }
     console.log(localStorage.foursquareauth);
 }
@@ -115,8 +121,8 @@ function add_gig(event_data) {
 function add_recommended_gig(event_data) {
     var myIcon = L.icon({
         iconUrl: 'img/music_rec.png',
-        iconSize: [32,32],
-        popupAnchor: [0, -16]
+        iconSize: [48,48],
+        popupAnchor: [0, -24]
     });
     var marker = new L.marker([event_data.venue.location["geo:point"]["geo:lat"], event_data.venue.location["geo:point"]["geo:long"]], {
         title: event_data.title,
