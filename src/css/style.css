@@ -1,16 +1,28 @@
-body {
+body, p {
     padding: 0;
-    margin: 0;
+    margin: 0;   
+}
+
+p, h1, h2, h3, h4, h5 {
+    font-family: 'Noto Serif', serif;
+}
+
+p {
+    padding-top: 1%;
 }
 
 html, body {
+    font-family: 'Noto Serif', serif;
     height: 100%;
 }
 
 #login {
     height: 5%;
+    text-align: center;
 }
 
 #map {
     height: 95%;
 }
+
+

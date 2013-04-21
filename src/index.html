@@ -12,6 +12,7 @@
         
         <!-- styles -->
         <link rel="stylesheet" href="css/style.css" />
+        <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Noto+Serif' type='text/css'>
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
         <!--[if lt IE 9]>
             <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
@@ -19,10 +20,6 @@
 
         <!-- favicons -->
         <link rel="shortcut icon" href="favicon.ico">
-        <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-72x72-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-114x114-precomposed.png">
-        <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-144x144-precomposed.png">
 
         <!-- microsoft :-( -->
         <!--[if lt IE 9]>
@@ -33,8 +30,9 @@
     <body>
 
         <div id="login">
-            <a href="http://www.last.fm/api/auth/?api_key=5806b1d8c748cdfca007cc76bd14dcff">last.fm</a>
-            <a href="https://foursquare.com/oauth2/authenticate?client_id=3QUP23AID2MSLC405MPXUZZAWY3B0TZNX4JTZ50HXZTR43XQ&response_type=token&redirect_uri=http://localhost/~martin/dionysus/src/">foursquare</a>
+            <p>
+            Login with <a href="http://www.last.fm/api/auth/?api_key=5806b1d8c748cdfca007cc76bd14dcff">last.fm</a> and/or <a href="https://foursquare.com/oauth2/authenticate?client_id=3QUP23AID2MSLC405MPXUZZAWY3B0TZNX4JTZ50HXZTR43XQ&response_type=token&redirect_uri=http://martinjc.com/dionysus/">foursquare</a>
+            </p>
         </div>
 
 
@@ -44,12 +42,12 @@
         <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
         <script src="http://code.jquery.com/jquery.js"></script>
         <!-- lastfm api javascript available from https://github.com/fxb/javascript-last.fm-api -->
-        <script src="js/lastfm.api.md5.js"></script>
-        <script src="js/lastfm.api.js"></script>
+        <script src="js/lastfm.api.md5.min.js"></script>
+        <script src="js/lastfm.api.min.js"></script>
 
-        <script src="js/consts.js"></script>
+        <script src="js/consts.min.js"></script>
         <script src="js/_credentials.js"></script>
-        <script src="js/map.js"></script>
+        <script src="js/map.min.js"></script>
 
     </body>
 </html>

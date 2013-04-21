@@ -1,4 +1,4 @@
-/* global L, console, foursq_client_id, foursq_client_secret, zooms, lastfm_api_key, lastfm_client_secret */
+/* global L, console, foursq_client_id, foursq_client_secret, zooms, lastfm_api_key, lastfm_client_secret, LastFM */
 (function(){
 var map = L.map('map');
 
@@ -38,14 +38,13 @@ function do_auth() {
         }
     }
     if (localStorage.foursquareauth === undefined) {
-        var auth = getURLParameter('access_token', window.location.hash);
+        auth = getURLParameter('access_token', window.location.hash);
         console.log(auth);
-        var auth = decodeURIComponent((new RegExp('[?|&|#]' + 'access_token' + '=' + '([^&;]+?)(&|#|;|$)').exec(window.location.hash)||[,""])[1].replace(/\+/g, '%20'))||null;
+        auth = decodeURIComponent((new RegExp('[?|&|#]' + 'access_token' + '=' + '([^&;]+?)(&|#|;|$)').exec(window.location.hash)||[,""])[1].replace(/\+/g, '%20'))||null;
         if(auth !== null) {
-            localStorage.foursquareauth = auth;    
+            localStorage.foursquareauth = auth;
         }
     }
-    console.log(localStorage.foursquareauth);
 }
 
 function hide_show_markers() {
@@ -77,7 +76,9 @@ function add_pub(venue_data) {
         title: venue_data.name,
         icon: myIcon
     });
-    marker.bindPopup("<h1>" + venue_data.name + "</h1>");
+    var popupstr = '';
+    popupstr += "<a href='" + venue_data.canonicalUrl + "'><img style='float:left; padding:4px' src='img/foursquare_icon.png' /><h1>" + venue_data.name + "</h1></a>";
+    marker.bindPopup(popupstr);
     if(pub_ids.indexOf(venue_data.id) <= -1) {
         pub_ids.push(venue_data.id);
         pubs.push(marker);
@@ -90,13 +91,23 @@ function add_recommended_pub(venue_data) {
         iconSize: [48,48],
         popupAnchor: [0, -24]
     });
-    var marker = new L.marker([venue_data.location.lat, venue_data.location.lng], {
-        title: venue_data.name,
+    var marker = new L.marker([venue_data.venue.location.lat, venue_data.venue.location.lng], {
+        title: venue_data.venue.name,
         icon: myIcon
     });
-    marker.bindPopup("<h1>" + venue_data.name + "</h1>");
-    if(pub_ids.indexOf(venue_data.id) <= -1) {
-        pub_ids.push(venue_data.id);
+    var popupstr = '';
+    popupstr += "<a href='" + venue_data.venue.canonicalUrl + "'><img style='float:left; padding:4px' src='img/foursquare_icon.png' /><h1>" + venue_data.venue.name + "</h1></a>";
+    if(venue_data.reasons.count > 0) {
+        popupstr += "<h3>Recommended because:</h3><ul>";
+        $.each(venue_data.reasons.items, function(k, reason) {
+            popupstr += "<li>" + reason.summary + "</li>";
+        });
+    }
+    popupstr += "</ul>";
+    popupstr += "<h4>Liked by:</h4><p>" + venue_data.venue.likes.summary + "</p>";
+    marker.bindPopup(popupstr);
+    if(pub_ids.indexOf(venue_data.venue.id) <= -1) {
+        pub_ids.push(venue_data.venue.id);
         pubs.push(marker);
     }
 }
@@ -111,7 +122,9 @@ function add_gig(event_data) {
         title: event_data.title,
         icon: myIcon
     });
-    marker.bindPopup("<h1>" + event_data.title + "</h1><h3>" + event_data.startDate + "</h3><p>" + event_data.venue.name + "</p>");
+    var popupstr = '';
+    popupstr += "<a href='" + event_data.url + "'><img style='float:left; padding:4px' src='img/lastfm_logo.png' /><h1>" + event_data.title + "</h1></a><h3>" + event_data.startDate + "</h3><p>" + event_data.venue.name + "</p>";
+    marker.bindPopup(popupstr);
     if(last_fm_event_ids.indexOf(event_data.id) <= -1) {
         last_fm_event_ids.push(event_data.id);
         last_fm_events.push(marker);
@@ -128,7 +141,9 @@ function add_recommended_gig(event_data) {
         title: event_data.title,
         icon: myIcon
     });
-    marker.bindPopup("<h1>" + event_data.title + "</h1><h3>" + event_data.startDate + "</h3><p>" + event_data.venue.name + "</p>");
+    var popupstr = '';
+    popupstr += "<a href='" + event_data.url + "'><img style='float:left; padding:4px' src='img/lastfm_logo.png' /><h1>" + event_data.title + "</h1></a><h3>" + event_data.startDate + "</h3><p>" + event_data.venue.name + "</p>";
+    marker.bindPopup(popupstr);
     if(last_fm_event_ids.indexOf(event_data.id) <= -1) {
         last_fm_event_ids.push(event_data.id);
         last_fm_events.push(marker);
@@ -166,6 +181,7 @@ function onMoveEnd() {
     })
     .done(function(data) {
         $.each(data.response.venues, function(i, item) {
+            console.log(item);
             add_pub(item);
         });
         hide_show_markers();
@@ -215,12 +231,11 @@ function onMoveEnd() {
             $.each(data.response.groups, function(i, group) {
                 console.log(group);
                 $.each(group.items, function(j, item) {
-                    console.log(item.venue.name);
-                    add_recommended_pub(item.venue);
+                    add_recommended_pub(item);
                 });
             });
             hide_show_markers();
-        });        
+        });
     }
 }
 
