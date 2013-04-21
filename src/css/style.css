@@ -2,6 +2,15 @@ body {
     padding: 0;
     margin: 0;
 }
-html, body, #map {
+
+html, body {
     height: 100%;
+}
+
+#login {
+    height: 5%;
+}
+
+#map {
+    height: 95%;
 }

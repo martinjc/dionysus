@@ -32,41 +32,24 @@
     </head>
     <body>
 
-        <div id="fb-root"></div>
-        <script src="js/_credentials.js"></script>
-        <script>
-          window.fbAsyncInit = function() {
-            // init the FB JS SDK
-            FB.init({
-              appId      : fb_app_id,                        // App ID from the app dashboard
-              //channelUrl : '/channel.html',                          // Channel file for x-domain comms
-              status     : true,                                 // Check Facebook Login status
-              xfbml      : true                                  // Look for social plugins on the page
-            });
+        <div id="login">
+            <a href="http://www.last.fm/api/auth/?api_key=5806b1d8c748cdfca007cc76bd14dcff">last.fm</a>
+            <a href="#">foursquare</a>
+            <a href="#">facebook</a>
+        </div>
 
-            // Additional initialization code such as adding Event Listeners goes here
-          };
-
-          // Load the SDK asynchronously
-          (function(d, s, id){
-             var js, fjs = d.getElementsByTagName(s)[0];
-             if (d.getElementById(id)) {return;}
-             js = d.createElement(s); js.id = id;
-             js.src = "//connect.facebook.net/en_US/all.js";
-             fjs.parentNode.insertBefore(js, fjs);
-           }(document, 'script', 'facebook-jssdk'));
-        </script>
 
         <div id="map"></div>
-
-        <footer>
-            <p>Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"></p>
-        </footer>
 
         <!-- scripts -->
         <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
         <script src="http://code.jquery.com/jquery.js"></script>
+        <!-- lastfm api javascript available from https://github.com/fxb/javascript-last.fm-api -->
+        <script src="js/lastfm.api.md5.js"></script>
+        <script src="js/lastfm.api.js"></script>
+        
         <script src="js/consts.js"></script>
+        <script src="js/_credentials.js"></script>
         <script src="js/map.js"></script>
 
     </body>

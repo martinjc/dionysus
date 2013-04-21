@@ -8,8 +8,23 @@ var pubs = [];
 var last_fm_event_ids = [];
 var last_fm_events = [];
 
+// http://stackoverflow.com/questions/1403888/get-url-parameter-with-jquery
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+}
+
+
+function do_auth() {
+
+    var auth = getURLParameter('auth');
+    console.log(auth);
+    if(auth === 'lastfm') {
+        var token = getURLParameter('token');
+        console.log(token);
+    }
+}
+
 function hide_show_markers() {
-    /*
     $.each(pubs, function(i, pub){
         if(map.getBounds().contains(pub.getLatLng())) {
             map.addLayer(pub);
@@ -26,13 +41,19 @@ function hide_show_markers() {
             map.removeLayer(item);
         }
     });
-    */
 }
 
 function add_pub(venue_data) {
-    var marker = new L.marker([venue_data.location.lat, venue_data.location.lng], {
-        title: venue_data.name
+    var myIcon = L.icon({
+        iconUrl: 'img/beer.png',
+        iconSize: [32,32],
+        popupAnchor: [0, -16]
     });
+    var marker = new L.marker([venue_data.location.lat, venue_data.location.lng], {
+        title: venue_data.name,
+        icon: myIcon
+    });
+    marker.bindPopup("<h1>" + venue_data.name + "</h1>");
     if(pub_ids.indexOf(venue_data.id) <= -1) {
         pub_ids.push(venue_data.id);
         pubs.push(marker);
@@ -40,9 +61,16 @@ function add_pub(venue_data) {
 }
 
 function add_gig(event_data) {
-    var marker = new L.marker([event_data.venue.location["geo:point"]["geo:lat"], event_data.venue.location["geo:point"]["geo:long"]], {
-        title: event_data.title
+    var myIcon = L.icon({
+        iconUrl: 'img/music.png',
+        iconSize: [32,32],
+        popupAnchor: [0, -16]
     });
+    var marker = new L.marker([event_data.venue.location["geo:point"]["geo:lat"], event_data.venue.location["geo:point"]["geo:long"]], {
+        title: event_data.title,
+        icon: myIcon
+    });
+    marker.bindPopup("<h1>" + event_data.title + "</h1><h3>" + event_data.startDate + "</h3><p>" + event_data.venue.name + "</p>");
     if(last_fm_event_ids.indexOf(event_data.id) <= -1) {
         last_fm_event_ids.push(event_data.id);
         last_fm_events.push(marker);
@@ -63,14 +91,11 @@ function onLocationFound() {
 
 function onMoveEnd() {
     var center = map.getCenter();
-    var bounds = map.getBounds();
-    console.log(bounds.getNorthEast());
-    console.log(bounds.getSouthWest());
     var ll = center.lat + "," + center.lng;
     var map_width = Math.max(map.getSize().x, map.getSize().y);
     var zoom = map.getZoom();
-    var metres = zooms[zoom] * map_width;
-    /*
+    var metres = Math.min(zooms[zoom] * map_width, 100000);
+
     $.getJSON("https://api.foursquare.com/v2/venues/search", {
         ll: ll,
         radius: metres,
@@ -93,6 +118,7 @@ function onMoveEnd() {
         long: center.lng,
         lat: center.lat,
         api_key: lastfm_api_key,
+        limit: 30,
         format: "json",
         distance: metres/1000
     }).done(function(data) {
@@ -101,28 +127,6 @@ function onMoveEnd() {
         });
         hide_show_markers();
     });
-*/
-    var query_string = 'SELECT eid FROM event_member WHERE uid IN (SELECT page_id FROM place WHERE distance(latitude, longitude, "' + center.lat + '", "' + center.lng + '") < 3000) AND start_time < "1367331612" AND start_time > "1366381212"';
-    FB.api(
-        {
-            method: 'fql.query',            
-            access_token: fb_access_token,
-            query: query_string
-        },
-        function(response) {
-            console.log(response);
-            $.each(response, function(i, item) {
-                console.log(item.eid);
-                FB.api('/' + item.eid, function(response){
-                    console.log(response);
-                    var venue_id = response.venue.id;
-                    FB.api('/' + venue_id, function(venue_response) {
-                        console.log(venue_response);
-                    })
-                });
-            });
-        }
-    );
 }
 
 
@@ -132,7 +136,9 @@ function initmap() {
     var tileLayer = new L.TileLayer(tileUrl, {minZoom: 8, maxZoom: 18, attribution: attrib});
 
     map.addLayer(tileLayer);
-    map.locate({setView: true, maxZoom: 17});
+    map.locate({setView: true, maxZoom: 16});
+
+    do_auth();
 
     map.on('locationerror', onLocationError);
     map.on('locationfound', onLocationFound);
